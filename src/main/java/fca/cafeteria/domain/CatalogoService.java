@@ -24,11 +24,8 @@ public class CatalogoService implements ICatalogoService {
         if (bebidaExiste(nombre)) return false;
 
         TipoBebida tipo;
-        if (tipoBebidaExiste(tipoDescripcion)) {
-            tipo = tipoBebidaRepository.findByDescripcion(tipoDescripcion).get();
-        } else {
-            tipo = guardarTipoBebida(tipoDescripcion);
-        }
+        Optional<TipoBebida> tipoExistente = tipoBebidaRepository.findByDescripcion(tipoDescripcion);
+        tipo = tipoExistente.orElseGet(() -> guardarTipoBebida(tipoDescripcion));
 
         guardarBebida(nombre, descripcion, tipo);
         return true;
@@ -36,7 +33,8 @@ public class CatalogoService implements ICatalogoService {
 
     @Override
     public boolean bebidaExiste(String nombre) {
-        return bebidaRepository.findByNombre(nombre).isPresent();
+        List<Bebida> bebidas = bebidaRepository.findByNombre(nombre);
+        return !bebidas.isEmpty();
     }
 
     @Override
