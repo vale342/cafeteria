@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tBebidaIngrediente")
-@Data
 public class BebidaIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,3 +20,4 @@ public class BebidaIngrediente {
 
     private Integer cantidad;
 }
+

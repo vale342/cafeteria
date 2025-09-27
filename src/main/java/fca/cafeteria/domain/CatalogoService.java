@@ -1,17 +1,11 @@
 package fca.cafeteria.domain;
 
-import fca.cafeteria.data.Bebida;
-import fca.cafeteria.data.TipoBebida;
-import fca.cafeteria.repository.BebidaRepository;
-import fca.cafeteria.repository.TipoBebidaRepository;
+import fca.cafeteria.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
-public class CatalogoService implements ICatalogoService {
+public class CatalogoService {
 
     @Autowired
     private BebidaRepository bebidaRepository;
@@ -19,47 +13,48 @@ public class CatalogoService implements ICatalogoService {
     @Autowired
     private TipoBebidaRepository tipoBebidaRepository;
 
-    @Override
-    public boolean registrarBebida(String nombre, String descripcion, String tipoDescripcion) {
-        if (bebidaExiste(nombre)) return false;
+    @Autowired
+    private IngredienteRepository ingredienteRepository;
 
-        TipoBebida tipo;
-        Optional<TipoBebida> tipoExistente = tipoBebidaRepository.findByDescripcion(tipoDescripcion);
-        tipo = tipoExistente.orElseGet(() -> guardarTipoBebida(tipoDescripcion));
+    @Autowired
+    private BebidaIngredienteRepository bebidaIngredienteRepository;
 
-        guardarBebida(nombre, descripcion, tipo);
-        return true;
-    }
+    // Registrar bebida con validación de tipo
+    public Bebida registrarBebida(Bebida bebida) {
+        if (bebida.getTipoBebida() == null || bebida.getTipoBebida().getId() == null) {
+            throw new IllegalArgumentException("Tipo de bebida no especificado");
+        }
 
-    @Override
-    public boolean bebidaExiste(String nombre) {
-        List<Bebida> bebidas = bebidaRepository.findByNombre(nombre);
-        return !bebidas.isEmpty();
-    }
+        boolean existeTipo = tipoBebidaRepository.existsById(bebida.getTipoBebida().getId());
+        if (!existeTipo) {
+            throw new IllegalArgumentException("Tipo de bebida no existe");
+        }
 
-    @Override
-    public boolean tipoBebidaExiste(String descripcion) {
-        return tipoBebidaRepository.findByDescripcion(descripcion).isPresent();
-    }
-
-    @Override
-    public TipoBebida guardarTipoBebida(String descripcion) {
-        TipoBebida tipo = new TipoBebida();
-        tipo.setDescripcion(descripcion);
-        return tipoBebidaRepository.save(tipo);
-    }
-
-    @Override
-    public Bebida guardarBebida(String nombre, String descripcion, TipoBebida tipoBebida) {
-        Bebida bebida = new Bebida();
-        bebida.setNombre(nombre);
-        bebida.setDescripcion(descripcion);
-        bebida.setTipoBebida(tipoBebida);
         return bebidaRepository.save(bebida);
     }
 
-    @Override
-    public List<Bebida> obtenerTodasLasBebidas() {
-        return bebidaRepository.findAll();
+    // Verificar si existe tipo de bebida
+    public boolean existeTipoBebida(Long id) {
+        return tipoBebidaRepository.existsById(id);
+    }
+
+    // Guardar bebida sin validación
+    public Bebida guardarBebida(Bebida bebida) {
+        return bebidaRepository.save(bebida);
+    }
+
+    // Guardar tipo de bebida
+    public TipoBebida guardarTipo(TipoBebida tipo) {
+        return tipoBebidaRepository.save(tipo);
+    }
+
+    // Guardar ingrediente
+    public Ingrediente guardarIngrediente(Ingrediente ingrediente) {
+        return ingredienteRepository.save(ingrediente);
+    }
+
+    // Asociar ingrediente a bebida
+    public BebidaIngrediente asociarIngrediente(BebidaIngrediente bi) {
+        return bebidaIngredienteRepository.save(bi);
     }
 }

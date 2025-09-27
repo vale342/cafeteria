@@ -1,32 +1,49 @@
 package fca.cafeteria.presentation;
 
-import fca.cafeteria.domain.ICatalogoService;
 import fca.cafeteria.data.Bebida;
-import fca.cafeteria.dto.BebidaDTO;
+import fca.cafeteria.data.BebidaIngrediente;
+import fca.cafeteria.data.Ingrediente;
+import fca.cafeteria.data.TipoBebida;
+import fca.cafeteria.domain.CatalogoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/catalogo")
 public class CatalogoController {
 
     @Autowired
-    private ICatalogoService catalogoService;
+    private CatalogoService catalogoService;
 
-    @PostMapping("/bebida")
-    public String registrarBebida(@RequestBody BebidaDTO bebidaDTO) {
-        boolean resultado = catalogoService.registrarBebida(
-                bebidaDTO.getNombre(),
-                bebidaDTO.getDescripcion(),
-                bebidaDTO.getTipo()
-        );
-        return resultado ? "bebidaagregada" : "yaexiste";
+    @PostMapping("/registrarBebida")
+    public ResponseEntity<Bebida> registrarBebida(@RequestBody Bebida bebida) {
+        Bebida bebidaGuardada = catalogoService.registrarBebida(bebida);
+        return ResponseEntity.ok(bebidaGuardada);
     }
 
-    @GetMapping("/bebidas")
-    public List<Bebida> getAllBebidas() {
-        return catalogoService.obtenerTodasLasBebidas();
+    @GetMapping("/existeTipoBebida/{id}")
+    public ResponseEntity<Boolean> existeTipoBebida(@PathVariable Long id) {
+        return ResponseEntity.ok(catalogoService.existeTipoBebida(id));
+    }
+
+    @PostMapping("/guardarBebida")
+    public ResponseEntity<Bebida> guardarBebida(@RequestBody Bebida bebida) {
+        return ResponseEntity.ok(catalogoService.guardarBebida(bebida));
+    }
+
+    @PostMapping("/guardarTipo")
+    public ResponseEntity<TipoBebida> guardarTipo(@RequestBody TipoBebida tipo) {
+        return ResponseEntity.ok(catalogoService.guardarTipo(tipo));
+    }
+
+    @PostMapping("/guardarIngrediente")
+    public ResponseEntity<Ingrediente> guardarIngrediente(@RequestBody Ingrediente ingrediente) {
+        return ResponseEntity.ok(catalogoService.guardarIngrediente(ingrediente));
+    }
+
+    @PostMapping("/asociarIngrediente")
+    public ResponseEntity<BebidaIngrediente> asociarIngrediente(@RequestBody BebidaIngrediente bi) {
+        return ResponseEntity.ok(catalogoService.asociarIngrediente(bi));
     }
 }

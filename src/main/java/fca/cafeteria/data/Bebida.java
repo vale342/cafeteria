@@ -1,21 +1,24 @@
 package fca.cafeteria.data;
 
 import jakarta.persistence.*;
-        import lombok.Data;
+
+import javax.net.ssl.SSLSession;
 
 @Entity
-@Table(name = "tbebida")
-@Data
+@Table(name = "tBebida")
 public class Bebida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
     private String nombre;
     private String descripcion;
 
     @ManyToOne
     @JoinColumn(name = "idTipoBebida")
     private TipoBebida tipoBebida;
+
+    public SSLSession getTipoBebida() {
+        return null;
+    }
 }
