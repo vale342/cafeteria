@@ -55,6 +55,19 @@ public class CatalogoService {
 
     // Asociar ingrediente a bebida
     public BebidaIngrediente asociarIngrediente(BebidaIngrediente bi) {
+        if (bi.getBebida() == null || bi.getBebida().getId() == null) {
+            throw new IllegalArgumentException("Bebida no especificada");
+        }
+        if (bi.getIngrediente() == null || bi.getIngrediente().getId() == null) {
+            throw new IllegalArgumentException("Ingrediente no especificado");
+        }
+        if (!bebidaRepository.existsById(bi.getBebida().getId())) {
+            throw new IllegalArgumentException("La bebida no existe");
+        }
+        if (!ingredienteRepository.existsById(bi.getIngrediente().getId())) {
+            throw new IllegalArgumentException("El ingrediente no existe");
+        }
+
         return bebidaIngredienteRepository.save(bi);
     }
 }
